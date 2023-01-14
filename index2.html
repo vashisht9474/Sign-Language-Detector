@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Document</title>
+        <style>
+            
+            
+            #webcam-container{
+                text-align: center;
+                
+                
+                margin-top: 10%;
+
+
+            }
+            
+            
+            #label-container{
+                text-align: center;
+                
+                text-decoration: #058b17;
+                margin-top: 5%;
+                width:100%;
+                font-size: xx-large;
+                font-weight: bolder;
+                font-style: oblique;
+                font-family: cursive;
+                box-sizing: content-box;
+                width: fit-content;
+                margin-left: 17cm ;
+                text-decoration: #058b17;
+            }
+            .container{  
+            text-align: center;  
+              
+            width: 100%;  
+            height: 900%;  
+             
+            }  
+            .container1{  
+            text-align: center;  
+              
+            width: 100%;  
+            height: 900%;  
+             
+            } 
+            .intro{  
+            text-align: center; 
+            size: 150cm;
+              
+            width: 100%;  
+             
+             
+            }  
+            header{
+                background-color: black;
+                size: 3cm;
+            }
+            .topnav {
+    box-shadow: 0 8px 16px 0 rgba(22, 18, 18, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  overflow: hidden;
+}
+
+/* Style the links inside the navigation bar */
+.topnav a {
+  float: left;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 14px 16px;
+  top:0;
+  text-decoration: none;
+  font-size: 17px;
+  z-index:1;
+}
+
+/* Change the color of links on hover */
+.topnav a:hover {
+  background-color: #ddd;
+  color: black;
+}
+
+/* Add a color to the active/current link */
+.topnav a.active {
+  background-color: #058b17;
+  color: white;
+}
+
+        </style>
+    </head>
+    <body>
+        
+        <header>
+            <div class="topnav">
+                <a class="active" href="file:///C:/Users/Hp/Desktop/final_se/home.html">Home</a>
+                
+                <a href="file:///C:/Users/Hp/Desktop/final_se/asl.html">ASL</a>
+                <a href="file:///C:/Users/Hp/Desktop/final_se/about.html">About</a>  
+            </div> 
+        <h1 style="color:rgb(0, 212, 0);font-size: xx-large;text-align:center;">Portal For Special Speakers</h1>
+        <div class="container" style ="position:relative; left:3.5cm; top:1cm;">
+            <button type="button button1" style="color:white;font-size: 24px;padding: 24px 16px;border-radius: 12px;transition-duration: 0.4s;box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+            color: black;
+            border: 2px solid #4CAF50;" onclick="init()"><span>Start Conversing</span></button>
+        </div>
+
+        <div class="container2" style ="position:absolute; left:11.5cm; top:4.65cm;">
+            <a href="file:///C:/Users/Hp/Desktop/final_se/text_audio.html">
+            <button type="button button1" style="color:white;font-size: 24px;padding: 24px 16px;border-radius: 12px;transition-duration: 0.4s;box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+            color: black;
+            border: 2px solid #4CAF50;"><span>Text->Audio</span></button>
+            </a>
+    </div>
+    
+        
+    </header>
+        
+        <div id="webcam-container"></div>
+        <div id="label-container"></div>
+        <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
+        <script type="text/javascript">
+
+            const URL ="https://teachablemachine.withgoogle.com/models/fDGpUdCHC/";
+            function initAudioPLayer(){
+                audio=new Audio();
+            }
+            window.addEventListener("load",initAudioPLayer);
+            let model, webcam, labelContainer,maxPredictions;
+
+            async function init(){
+                const modelURL = URL + "model.json";
+                const metadataURL = URL + "metadata.json";
+
+        // load the model and metadata
+        // Refer to tmImage.loadFromFiles() in the API to support files from a file picker
+        // or files from your local hard drive
+        // Note: the pose library adds "tmImage" object to your window (window.tmImage)
+        model = await tmImage.load(modelURL, metadataURL);
+        maxPredictions = model.getTotalClasses();
+
+        // Convenience function to setup a webcam
+        const flip = true; // whether to flip the webcam
+        webcam = new tmImage.Webcam(200, 200, flip); // width, height, flip
+        await webcam.setup(); // request access to the webcam
+        await webcam.play();
+        window.requestAnimationFrame(loop);
+
+        // append elements to the DOM
+        document.getElementById("webcam-container").appendChild(webcam.canvas);
+        labelContainer = document.getElementById("label-container");
+        for (let i = 0; i < maxPredictions; i++) { // and class labels
+            labelContainer.appendChild(document.createTextNode(" "));
+        }
+    }
+
+    async function loop() {
+        webcam.update(); // update the webcam frame
+        await predict();
+        window.requestAnimationFrame(loop);
+    }
+
+    async function predict(){
+
+        const prediction = await model.predict(webcam.canvas);
+        
+        // else if(prediction[1].probability.toFixed(2)>0.90){
+        // labelContainer.childNodes[0].innerHTML=" B" ;   
+        // }
+
+        // // else if(prediction[2].probability.toFixed(2)>0.90){
+        // // labelContainer.childNodes[0].innerHTML=" C" ;   
+        // // }
+
+        // else{
+        //     labelContainer.childNodes[0].innerHTML="cant predict";
+        // }
+        
+        // for (let i = 0; i < maxPredictions; i++) {
+        //     const classPrediction =
+        //         prediction[i].className + ": " + prediction[i].probability.toFixed(2);
+        //     labelContainer.childNodes[i].innerHTML = classPrediction;
+        //     var audio = new Audio('C:\Users\Hp\Desktop\final_Se\my_model\8d82b5_Letter_A_Sound_Effect.mp3')
+            
+        // }
+        for (let i = 0; i < maxPredictions; i++) {
+            
+            // const classPrediction =
+            //     prediction[i].className + ": " + prediction[i].probability.toFixed(2);
+            // labelContainer.childNodes[i].innerHTML = classPrediction;
+            // var audio = new Audio('C:\Users\Hp\Desktop\final_Se\my_model\8d82b5_Letter_A_Sound_Effect.mp3')
+            if(prediction[i].probability.toFixed(2)>0.9)
+            {
+                labelContainer.innerHTML = prediction[i].className;
+            }
+            
+            
+        
+    }
+}
+    
+        </script>
+      
+        
+
+    </body>
+</html>
